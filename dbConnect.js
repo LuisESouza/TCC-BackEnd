@@ -3,7 +3,7 @@ let globalConnection;
 async function connect() {
     if (globalConnection) {
         return globalConnection.connect();
-    } else {
+    }
         const pool = new Pool({
             connectionString: process.env.CONNECTION_STRING,
             ssl: {
@@ -22,7 +22,6 @@ async function connect() {
             console.error("Erro ao conectar ao banco de dados:", error);
             throw error;
         }
-    }
 }
 module.exports = {
     connect,
