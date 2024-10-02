@@ -44,7 +44,7 @@ async function userLoginC(req, res) {
 }
 
 async function updateUserProfileC(req, res) {
-    const { altura, peso, objetivo } = req.body;
+    const { altura, peso, objetivo, hora_treino_inicio, data_treino_inicio, hora_treino_fim, data_treino_fim  } = req.body;
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
         return res.status(401).json({ error: "Token não fornecido" });
@@ -52,7 +52,7 @@ async function updateUserProfileC(req, res) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
-        const updatedProfile = await userModel.updateUserProfileM(altura, peso, objetivo, userId);
+        const updatedProfile = await userModel.updateUserProfileM(altura, peso, objetivo,hora_treino_inicio, data_treino_inicio, hora_treino_fim,data_treino_fim , userId);
         if (!updatedProfile) {
             return res.status(404).json({ error: "Perfil não encontrado" });
         }

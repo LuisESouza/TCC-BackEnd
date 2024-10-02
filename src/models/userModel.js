@@ -26,11 +26,12 @@ async function findUserByEmailM(email) {
     }
 }
 
-async function updateUserProfileM(altura, peso, objetivo, userId) {
+async function updateUserProfileM(altura, peso, objetivo, hora_treino_inicio, data_treino_inicio, hora_treino_fim,data_treino_fim , userId) {
     const client = await dbConnect.connect();
     try {
-        const sql = "UPDATE Perfil SET altura = $1, peso = $2, objetivo = $3 WHERE id_registro = $4 RETURNING *";
-        const values = [altura, peso, objetivo, userId];
+        const sql = "UPDATE Perfil SET altura = $1, peso = $2, objetivo = $3, hora_treino_inicio = $4,data_treino_inicio = $5,hora_treino_fim  = $6,data_treino_fim  = $7 WHERE id_registro = $8 RETURNING *";
+
+        const values = [altura, peso, objetivo, hora_treino_inicio, data_treino_inicio, hora_treino_fim, data_treino_fim, userId];
         const result = await client.query(sql, values);
         return result.rows[0];
     } finally {
