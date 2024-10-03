@@ -1,6 +1,8 @@
 const userModel = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const nodemailer = require("nodemailer");
+const { consumers } = require("nodemailer/lib/xoauth2");
 
 async function insertUserC(req, res) {
     const { nome_completo, email, cpf, senha } = req.body;
@@ -98,10 +100,80 @@ async function getUserPlanC(req, res) {
     }
 }
 
+async function resetPasswordC(req, res) {
+    const { email, senha } = req.body;
+    try{
+        if(!email, !senha){
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(senha, 10);
+        updateUser = await userModel.updateUserPasswordM(email, hashedPassword);
+    }catch(error){
+        res.status
+    }
+}
+
+async function sendEmail(req, res) {
+    const { email } = req.body;
+    try {
+        let newPassWord = Math.floor(Math.random() * (20000 - 10000) + 10000).toString();
+        if (!email) {
+            return res.status(400).json({ error: "Email é obrigatório." });
+        }
+        const user = await userModel.findUserByEmailM(email);
+        if (!user) {
+            return res.status(404).json({ error: "Email não registrado." });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassWord, 10);
+        const updatedUser = await userModel.updateUserPasswordM(email, hashedPassword);
+
+        if (!updatedUser) {
+            return res.status(500).json({ error: "Erro ao atualizar senha." });
+        }
+
+        const sender = {
+            email: "dicefitemail@gmail.com",
+            pass: "tujc pjym jgpv lycs"
+        };
+
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: sender.email,
+                pass: sender.pass
+            }
+        });
+
+        let mailOptions = {
+            from: sender.email,
+            to: email,
+            subject: 'Recuperar Senha',
+            html: `<h1>Recuperar Senha</h1><p><strong>Nova senha:</strong> ${newPassWord}</p>`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error("Erro ao enviar email:", error);
+                return res.status(500).json({ error: "Erro ao enviar email." });
+            } else {
+                console.log('Email enviado: ' + info.response);
+                return res.status(200).json({ message: "Email enviado com sucesso." });
+            }
+        });
+    } catch (error) {
+        console.error("Erro ao enviar email:", error);
+        return res.status(500).json({ error: "Erro ao enviar email." });
+    }
+}
+
+
 module.exports = {
     insertUserC,
     userLoginC,
     updateUserProfileC,
     getUserProfileC,
-    getUserPlanC
+    getUserPlanC,
+    sendEmail,
+    resetPasswordC
 };
