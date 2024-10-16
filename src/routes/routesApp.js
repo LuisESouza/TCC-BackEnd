@@ -1,6 +1,7 @@
 const express = require("express");
 const userController = require("../controllers/userController.js");
-const planoController = require("../controllers/planoController.js")
+const planoController = require("../controllers/planoController.js");
+const exercicioController = require("../controllers/exerciciosController.js");
 const authMiddleware = require("./authMiddleware.js");
 
 const router = express.Router();
@@ -16,6 +17,7 @@ router.put('/password/update', authMiddleware, userController.resetPasswordC);
 //ROUTER GET
 router.get('/perfil', authMiddleware, userController.getUserProfileC);
 router.get('/planos', authMiddleware, planoController.getPlanosC);
+router.get('/treino/exercicios', exercicioController.getExerciciosC);
 // router.get('/treino');
 // router.get('/dieta');
 
