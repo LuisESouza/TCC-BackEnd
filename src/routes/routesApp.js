@@ -17,7 +17,7 @@ router.put('/password/update', authMiddleware, userController.resetPasswordC);
 //ROUTER GET
 router.get('/perfil', authMiddleware, userController.getUserProfileC);
 router.get('/planos', authMiddleware, planoController.getPlanosC);
-router.get('/treino/exercicios', exercicioController.getExerciciosC);
+router.get('/treino/exercicios/tipos/:tipo_exercicio', exercicioController.getExerciciosTiposC);
 // router.get('/treino');
 // router.get('/dieta');
 
