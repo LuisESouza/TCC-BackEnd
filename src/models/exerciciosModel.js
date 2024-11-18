@@ -98,29 +98,20 @@ async function putTreinoM(training_stats, id) {
         client.release();
     }
 }
-async function putTreinoExercicioM(id_treino, id_exercicio, carga, series, repeticoes) {
+async function putTreinoExercicioM(id_exercicio, carga, series, repeticoes) {
     const client = await dbConnect.connect();
     try {
-        const getIdSql = `
-            SELECT te.id
-            FROM treino_exercicios te
-            INNER JOIN treino t ON te.id_treino = t.id
-            INNER JOIN exercicios e ON te.id_exercicio = e.id
-            WHERE te.id_treino = $1 AND te.id_exercicio = $2
+        const updateSql = `
+            UPDATE treino_exercicios
+            SET repeticoes = $1, series = $2, carga = $3
+            WHERE id = $4
         `;
-        const getIdValues = [id_treino, id_exercicio];
-        const result = await client.query(getIdSql, getIdValues);
-        if (result.rows.length > 0) {
-            const id_treino_exercicio = result.rows[0].id;
-            const updateSql = `
-                UPDATE treino_exercicios
-                SET repeticoes = $1, series = $2, carga = $3
-                WHERE id = $4
-            `;
-            const updateValues = [repeticoes, series, carga, id_treino_exercicio];
-            await client.query(updateSql, updateValues);
+        const updateValues = [repeticoes, series, carga, id_exercicio];
+        const result = await client.query(updateSql, updateValues);
+        if (result.rowCount > 0) {
+            console.log("Treino_exercicio atualizado com sucesso!");
         } else {
-            console.error("Treino_exercicio não encontrado com os ids fornecidos.");
+            console.error("Nenhum treino_exercicio encontrado com o id fornecido:", id_exercicio);
         }
     } catch (error) {
         console.error("Erro ao atualizar exercício do treino:", error);

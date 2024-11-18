@@ -64,10 +64,10 @@ async function putTreinoC(req, res) {
     }
 }
 async function putTreinoExercicioC(req, res) {
+    //
     const { id_treino, id_exercicio, carga, series, repeticoes } = req.body
     try{
-        console.log(id_treino,id_exercicio, carga, series, repeticoes);
-        const treinos = await exerciciosModel.putTreinoExercicioM(id_treino, id_exercicio, carga, series, repeticoes);
+        const treinos = await exerciciosModel.putTreinoExercicioM(id_exercicio, carga, series, repeticoes);
         res.status(200).json(treinos);
     }catch(error){
         console.log(error);
