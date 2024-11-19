@@ -1,4 +1,9 @@
 const dbConnect = require("../../dbConnect");
+
+/**
+ * Retorna todos os exercícios cadastrados no banco de dados.
+ * @returns {Promise<Array>} Um array com os dados dos exercícios.
+ */
 async function getExerciciosM() {
     const client = await dbConnect.connect();
     try {
@@ -9,6 +14,12 @@ async function getExerciciosM() {
         client.release();
     }
 }
+
+/**
+ * Retorna os exercícios filtrados pelo tipo de exercício. Se o tipo for 'Todos', retorna todos os exercícios.
+ * @param {string} value - O tipo de exercício a ser filtrado (ex: 'Cardio', 'Força', 'Todos').
+ * @returns {Promise<Array>} Um array com os dados dos exercícios filtrados.
+ */
 async function getExerciciosTiposM(value) {
     if (value !== 'Todos') {
         const client = await dbConnect.connect();
@@ -23,17 +34,29 @@ async function getExerciciosTiposM(value) {
         return await getExerciciosM();
     }
 }
+
+/**
+ * Retorna todos os treinos de um cliente com base no ID do cliente.
+ * @param {number} [id_cliente=1] - O ID do cliente. O valor padrão é 1.
+ * @returns {Promise<Array>} Um array com os dados dos treinos do cliente.
+ */
 async function getTreinosM(id_cliente = 1) {
     const client = await dbConnect.connect();
     try{
         const sql = "SELECT * FROM treino WHERE id_cliente = $1";
-        const value = [id_cliente]
+        const value = [id_cliente];
         const result = await client.query(sql, value);
         return result.rows;
     }finally{
         client.release();
     }
 }
+
+/**
+ * Retorna os exercícios associados a um treino específico.
+ * @param {number} id_treino - O ID do treino.
+ * @returns {Promise<Array>} Um array com os dados dos exercícios associados ao treino.
+ */
 async function getExerciciosPorTreinoM(id_treino) {
     const client = await dbConnect.connect();
     try {
@@ -60,17 +83,37 @@ async function getExerciciosPorTreinoM(id_treino) {
     }
 }
 
-async function setTreinoM( nome_treino, id_cliente, hora_treino_inicio, hora_treino_fim, data_treino,training_stats ) {
+/**
+ * Cria um novo treino no banco de dados.
+ * @param {string} nome_treino - O nome do treino.
+ * @param {number} id_cliente - O ID do cliente que está criando o treino.
+ * @param {string} hora_treino_inicio - O horário de início do treino.
+ * @param {string} hora_treino_fim - O horário de término do treino.
+ * @param {string} data_treino - A data do treino.
+ * @param {string} training_stats - Informações sobre o progresso do treino.
+ * @returns {Promise<Object>} Os dados do treino recém-criado.
+ */
+async function setTreinoM(nome_treino, id_cliente, hora_treino_inicio, hora_treino_fim, data_treino, training_stats) {
     const client = await dbConnect.connect();
-    try{
+    try {
         const sql = "INSERT INTO treino( nome_treino ,id_cliente, hora_treino_inicio, hora_treino_fim, data_treino, training_stats) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *";
-        const value = [ nome_treino, id_cliente, hora_treino_inicio, hora_treino_fim, data_treino, training_stats];
+        const value = [nome_treino, id_cliente, hora_treino_inicio, hora_treino_fim, data_treino, training_stats];
         const result = await client.query(sql, value);
         return result.rows[0];
-    }catch(error){
-        console.log(error)
+    } catch (error) {
+        console.log(error);
     }
 }
+
+/**
+ * Associa um exercício a um treino específico.
+ * @param {number} id_treino - O ID do treino.
+ * @param {number} id_exercicio - O ID do exercício.
+ * @param {number} repeticoes - O número de repetições do exercício.
+ * @param {number} series - O número de séries do exercício.
+ * @param {number} carga - A carga do exercício.
+ * @returns {Promise<void>}
+ */
 async function setTreinoExercicioM(id_treino, id_exercicio, repeticoes, series, carga) {
     const client = await dbConnect.connect();
     try {
@@ -81,6 +124,13 @@ async function setTreinoExercicioM(id_treino, id_exercicio, repeticoes, series, 
         client.release();
     }
 }
+
+/**
+ * Atualiza as informações de treino no banco de dados.
+ * @param {string} training_stats - As novas informações de progresso do treino.
+ * @param {number} id - O ID do treino a ser atualizado.
+ * @returns {Promise<void>}
+ */
 async function putTreinoM(training_stats, id) {
     const client = await dbConnect.connect();
     try {
@@ -98,6 +148,15 @@ async function putTreinoM(training_stats, id) {
         client.release();
     }
 }
+
+/**
+ * Atualiza as informações de um exercício em um treino.
+ * @param {number} id_exercicio - O ID do exercício a ser atualizado.
+ * @param {number} carga - A nova carga do exercício.
+ * @param {number} series - O novo número de séries do exercício.
+ * @param {number} repeticoes - O novo número de repetições do exercício.
+ * @returns {Promise<void>}
+ */
 async function putTreinoExercicioM(id_exercicio, carga, series, repeticoes) {
     const client = await dbConnect.connect();
     try {
@@ -119,7 +178,6 @@ async function putTreinoExercicioM(id_exercicio, carga, series, repeticoes) {
         client.release();
     }
 }
-
 
 module.exports = { 
     getExerciciosPorTreinoM,
